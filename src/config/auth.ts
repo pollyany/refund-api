@@ -1,6 +1,6 @@
 export const authConfig = {
   jwt: {
-    secrete: "pollyany",
+    secret: "pollyany",
     expiresIn: "1d",
   },
 };
