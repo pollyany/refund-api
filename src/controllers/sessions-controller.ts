@@ -1,9 +1,10 @@
-import { prisma } from "@/database/prisma";
 import { AppError } from "@/utils/AppError";
+import { prisma } from "@/database/prisma";
 import { compare } from "bcrypt";
 import { Request, Response } from "express";
 import z from "zod";
-
+import { authConfig } from "@/config/auth";
+import { sign } from "jsonwebtoken";
 class SessionsController {
   async create(request: Request, response: Response) {
     const bodySchema = z.object({
@@ -29,7 +30,16 @@ class SessionsController {
       throw new AppError("E-mail ou senha incorretos", 401);
     }
 
-    response.json({ message: "Session created successfully" });
+    const { secrete, expiresIn } = authConfig.jwt;
+
+    const token = sign({ role: user.role }, secrete, {
+      subject: user.id,
+      expiresIn,
+    });
+
+    const { password: _, ...userWithoutPassword } = user;
+
+    response.json({ token, user: userWithoutPassword });
   }
 }
 
