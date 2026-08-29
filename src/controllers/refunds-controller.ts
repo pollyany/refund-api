@@ -96,6 +96,25 @@ class RefundsController {
       },
     });
   }
+  async show(request: Request, response: Response) {
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+    });
+
+    const { id } = paramsSchema.parse(request.params);
+
+    const refund = await prisma.refunds.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!refund) {
+      throw new AppError("Reembolso não encontrado", 404);
+    }
+
+    return response.status(200).json(refund);
+  }
 }
 
 export { RefundsController };
